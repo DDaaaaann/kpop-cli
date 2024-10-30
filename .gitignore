@@ -1,0 +1,27 @@
+# Binaries
+kpop
+
+# Build artifacts and temporary files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go module files
+go.sum
+
+# IDE and editor configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Log files
+*.log
+
+# System-specific files
+.DS_Store  # macOS files
+Thumbs.db  # Windows files
