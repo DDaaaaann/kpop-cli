@@ -1,14 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
-	"strconv"
 	"strings"
 )
 
@@ -33,14 +30,9 @@ func main() {
 	if len(flag.Args()) > 0 {
 		port = flag.Arg(0)
 	} else {
-		port = findRecentPortError()
-		if port == "" {
-			fmt.Println("Error: No port specified and no recent port error found.")
-			usage()
-			os.Exit(1)
-		} else {
-			fmt.Println("Using detected port:", port)
-		}
+		fmt.Println("Error: No port specified and no recent port error found.")
+		usage()
+		os.Exit(1)
 	}
 
 	pid := getPID(port)
@@ -94,53 +86,4 @@ func killPID(pid string) error {
 		cmd = exec.Command("kill", "-9", pid)
 	}
 	return cmd.Run()
-}
-
-func findRecentPortError() string {
-	// Determine the shell and history file path
-	shell := os.Getenv("SHELL")
-	var historyFilePath string
-
-	if strings.Contains(shell, "bash") {
-		historyFilePath = os.Getenv("HOME") + "/.bash_history"
-	} else if strings.Contains(shell, "zsh") {
-		historyFilePath = os.Getenv("HOME") + "/.zsh_history"
-	} else {
-		log.Println("Unsupported shell for history detection.")
-		return ""
-	}
-
-	// Open the history file
-	historyFile, err := os.Open(historyFilePath)
-	if err != nil {
-		log.Fatalf("Error opening history file: %v\n", err)
-	}
-	defer historyFile.Close()
-
-	scanner := bufio.NewScanner(historyFile)
-	var lastPortError string
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, "address already in use") || strings.Contains(line, "port") {
-			lastPortError = line
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	return extractPort(lastPortError)
-}
-
-func extractPort(errorLine string) string {
-	parts := strings.Fields(errorLine)
-	for i, part := range parts {
-		if part == "port" && i+1 < len(parts) {
-			if _, err := strconv.Atoi(parts[i+1]); err == nil {
-				return parts[i+1]
-			}
-		}
-	}
-	return ""
 }
