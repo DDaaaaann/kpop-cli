@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 )
@@ -24,6 +25,11 @@ func getPID(port string, executor CommandExecutor) string {
 // killPID terminates the process with the given PID.
 func killPID(pid string, executor CommandExecutor) error {
 	var err error
+
+	if pid == "" {
+		return fmt.Errorf("no PID provided")
+	}
+
 	if runtime.GOOS == "windows" {
 		_, err = executor.Execute("taskkill", "/PID", pid, "/F")
 	} else {

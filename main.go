@@ -4,19 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/exec"
 )
-
-type CommandExecutor interface {
-	Execute(name string, arg ...string) ([]byte, error)
-}
-
-type RealCommandExecutor struct{}
-
-func (r *RealCommandExecutor) Execute(name string, arg ...string) ([]byte, error) {
-	cmd := exec.Command(name, arg...)
-	return cmd.Output()
-}
 
 // Flags
 var forceFlag = flag.Bool("f", false, "Force kill without confirmation")
