@@ -1,13 +1,14 @@
-package main
+package process
 
 import (
 	"fmt"
+	"github.com/DDaaaaann/kpop-cli/internal/executor"
 	"runtime"
 	"strings"
 )
 
-// getPID fetches the process ID for a given port by executing the appropriate command.
-func getPID(port string, executor CommandExecutor) string {
+// GetPID fetches the process ID for a given port by executing the appropriate command.
+func GetPID(port string, executor executor.CommandExecutor) string {
 	var out []byte
 	var err error
 	if runtime.GOOS == "windows" {
@@ -22,8 +23,8 @@ func getPID(port string, executor CommandExecutor) string {
 	return strings.TrimSpace(string(out))
 }
 
-// killPID terminates the process with the given PID.
-func killPID(pid string, executor CommandExecutor) error {
+// KillPID terminates the process with the given PID.
+func KillPID(pid string, executor executor.CommandExecutor) error {
 	var err error
 
 	if pid == "" {

@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/DDaaaaann/kpop-cli/internal/executor"
+	"github.com/DDaaaaann/kpop-cli/internal/process"
 	"os"
 )
 
-// Flags
 var forceFlag = flag.Bool("f", false, "Force kill without confirmation")
 var quietFlag = flag.Bool("q", false, "Quiet mode, suppress output")
 
@@ -29,10 +30,9 @@ func main() {
 	}
 	port := flag.Arg(0)
 
-	executor := &RealCommandExecutor{}
+	realExecutor := &executor.RealCommandExecutor{}
 
-	// Use real exec.Command for production code
-	pid := getPID(port, executor)
+	pid := process.GetPID(port, realExecutor)
 	if pid == "" {
 		if !*quietFlag {
 			fmt.Println("No process found using port", port)
@@ -52,7 +52,7 @@ func main() {
 		}
 	}
 
-	err := killPID(pid, executor)
+	err := process.KillPID(pid, realExecutor)
 	if err != nil && !*quietFlag {
 		fmt.Printf("Failed to kill process %s on port %s: %v\n", pid, port, err)
 	} else if !*quietFlag {

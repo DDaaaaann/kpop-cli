@@ -1,4 +1,4 @@
-package main
+package executor
 
 import "os/exec"
 
@@ -13,6 +13,10 @@ func (r *RealCommandExecutor) Execute(name string, arg ...string) ([]byte, error
 	return cmd.Output()
 }
 
+func MockCmdExecutor(output string, err error) CommandExecutor {
+	return &MockCommandExecutor{Output: output, Err: err}
+}
+
 type MockCommandExecutor struct {
 	Output string
 	Err    error
@@ -23,8 +27,4 @@ func (m *MockCommandExecutor) Execute(name string, arg ...string) ([]byte, error
 		return nil, m.Err
 	}
 	return []byte(m.Output), nil
-}
-
-func mockCommandExecutor(output string, err error) CommandExecutor {
-	return &MockCommandExecutor{Output: output, Err: err}
 }
