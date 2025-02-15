@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/DDaaaaann/kpop-cli/internal"
 	"github.com/DDaaaaann/kpop-cli/internal/executor"
-	"github.com/DDaaaaann/kpop-cli/internal/process"
 	"os"
 )
 
 var forceFlag = flag.Bool("f", false, "Force kill without confirmation")
 var quietFlag = flag.Bool("q", false, "Quiet mode, suppress output")
+var realExecutor = executor.RealCommandExecutor{}
 
 func usage() {
 	fmt.Println("Usage: kill-port [-f] [-q] <port>")
@@ -20,6 +21,11 @@ func usage() {
 }
 
 func main() {
+	port := extractPortFromArgs()
+	internal.KPOP(port, *forceFlag, *quietFlag, os.Stdin, os.Stdout, &realExecutor)
+}
+
+func extractPortFromArgs() string {
 	flag.Usage = usage
 	flag.Parse()
 
@@ -28,34 +34,5 @@ func main() {
 		usage()
 		os.Exit(1)
 	}
-	port := flag.Arg(0)
-
-	realExecutor := &executor.RealCommandExecutor{}
-
-	pid := process.GetPID(port, realExecutor)
-	if pid == "" {
-		if !*quietFlag {
-			fmt.Println("No process found using port", port)
-		}
-		return
-	}
-
-	if !*forceFlag {
-		var confirm string
-		fmt.Printf("Kill process using port %s (PID %s)? (y/n) ", port, pid)
-		fmt.Scanln(&confirm)
-		if confirm != "y" {
-			if !*quietFlag {
-				fmt.Println("Cancelled.")
-			}
-			return
-		}
-	}
-
-	err := process.KillPID(pid, realExecutor)
-	if err != nil && !*quietFlag {
-		fmt.Printf("Failed to kill process %s on port %s: %v\n", pid, port, err)
-	} else if !*quietFlag {
-		fmt.Printf("Killed process %s on port %s.\n", pid, port)
-	}
+	return flag.Arg(0)
 }

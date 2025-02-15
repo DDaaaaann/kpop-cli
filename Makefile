@@ -4,15 +4,19 @@
 BINARY_NAME := kpop-cli
 VERSION := 1.0.0
 
+# Run app
+run:
+	go run cmd/kill-port/main.go 12345
+
 # Install dependencies
 deps:
 	go mod tidy
 
 # Build binaries for all platforms
 build:
-	GOOS=linux GOARCH=amd64 go build -o dist/$(BINARY_NAME)-linux-amd64 main.go
-	GOOS=darwin GOARCH=amd64 go build -o dist/$(BINARY_NAME)-darwin-amd64 main.go
-	GOOS=windows GOARCH=amd64 go build -o dist/$(BINARY_NAME)-windows-amd64.exe main.go
+	GOOS=linux GOARCH=amd64 go build -o dist/$(BINARY_NAME)-linux-amd64 ./cmd/kill-port
+	GOOS=darwin GOARCH=amd64 go build -o dist/$(BINARY_NAME)-darwin-amd64 ./cmd/kill-port
+	GOOS=windows GOARCH=amd64 go build -o dist/$(BINARY_NAME)-windows-amd64.exe ./cmd/kill-port
 
 # Run tests
 test:

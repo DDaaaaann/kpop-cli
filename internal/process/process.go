@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-// GetPID fetches the process ID for a given port by executing the appropriate command.
-func GetPID(port string, executor executor.CommandExecutor) string {
+// FindProcessUsingPort fetches the process ID for a given port by executing the appropriate command.
+func FindProcessUsingPort(port string, executor executor.CommandExecutor) string {
 	var out []byte
 	var err error
 	if runtime.GOOS == "windows" {
@@ -23,10 +23,9 @@ func GetPID(port string, executor executor.CommandExecutor) string {
 	return strings.TrimSpace(string(out))
 }
 
-// KillPID terminates the process with the given PID.
-func KillPID(pid string, executor executor.CommandExecutor) error {
+// KillProcess terminates the process with the given PID.
+func KillProcess(pid string, executor executor.CommandExecutor) error {
 	var err error
-
 	if pid == "" {
 		return fmt.Errorf("no PID provided")
 	}

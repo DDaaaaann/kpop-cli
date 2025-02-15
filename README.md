@@ -7,7 +7,7 @@
   </a>
 
 <h3 align="center">KPOP-CLI</h3>
-  <em>Kill Process on Port</em>
+<em>Kill Process on Port</em>
   <p align="center">
     A CLI solution to kill any process on any port!
     <br />
@@ -37,6 +37,7 @@
 </details>
 
 ## About The Project
+
 A command-line tool for killing processes running on a specified port. This tool is useful for
 developers who encounter errors stating that a port is already in use.
 
