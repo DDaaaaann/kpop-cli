@@ -48,7 +48,7 @@ func ParseFirstPID(output []byte, format ProcessOutputFormat) (int, error) {
 				}
 			}
 		default:
-			return 0, fmt.Errorf("unsupported format: %v", format)
+			return 0, fmt.Errorf("unsupported format")
 		}
 	}
 

@@ -15,22 +15,35 @@ func TestParseProcessOutput(t *testing.T) {
 		expectedErr string
 	}{
 		{
-			name:     "Pid Only success",
+			name:     "Pid-only format success",
 			output:   []byte("9999\n"),
 			format:   utils.FormatPIDOnly,
 			expected: 9999,
 		},
 		{
-			name:        "Pid Only failure",
+			name:        "Pid-only format failure",
 			output:      []byte("abc"),
 			format:      utils.FormatPIDOnly,
 			expectedErr: "non pid format: 'abc'",
 		},
 		{
-			name:        "Pid Only failure",
+			name:        "Pid-only format failure",
 			output:      []byte("\n"),
 			format:      utils.FormatPIDOnly,
 			expectedErr: "no output found",
+		},
+		{
+			name: "Netstat format success",
+			output: []byte(`  TCP    0.0.0.0:12345          0.0.0.0:0              LISTENING       9999\n
+				  TCP    [::]:12345             [::]:0                 LISTENING       9999`),
+			format:   utils.FormatNetstat,
+			expected: 9999,
+		},
+		{
+			name:        "Unsupported format failure",
+			output:      []byte("9999"),
+			format:      -1,
+			expectedErr: "unsupported format",
 		},
 	}
 	for _, tt := range tests {
