@@ -2,30 +2,74 @@ package main
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"github.com/DDaaaaann/kpop-cli/internal"
-	"github.com/DDaaaaann/kpop-cli/tests/integration/testutils"
+	"github.com/DDaaaaann/kpop-cli/internal/executor"
+	"github.com/DDaaaaann/kpop-cli/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"
 )
 
-func TestKpopCLI_success(t *testing.T) {
+func TestKpopCLI(t *testing.T) {
 	var stdin, stdout bytes.Buffer
-	port, pid, kill := testutils.StartTestServer()
+	var tests = []struct {
+		name string
+		port string
+		pid  int
+		err  error
+		kill bool
+		want string
+	}{
+		{
+			name: "Successfully kill process on port",
+			port: "8080",
+			pid:  9999,
+			kill: true,
+			want: `Kill process on port 8080 (PID 9999)? (y/n)
+Killed process 9999 on port 8080.`,
+		},
+		{
+			name: "Cancel kill process on port",
+			port: "123",
+			pid:  98765,
+			kill: false,
+			want: `Kill process on port 123 (PID 98765)? (y/n)
+Cancelled.`,
+		},
+		{
+			name: "Wrong port input",
+			port: "abc",
+			want: `Port 'abc' is not well formatted`,
+		},
+		{
+			name: "No pid found",
+			port: "123",
+			err:  errors.New("could not extract pid"),
+			want: `No process found using port 123`,
+		},
+	}
 
-	stdin.WriteString("y\n")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockExecutor := executor.MockCmdExecutor([]byte(strconv.Itoa(tt.pid)), tt.err, utils.FormatPIDOnly)
 
-	exists, _ := testutils.ProcessExists(pid)
-	assert.True(t, exists, fmt.Sprintf("No process with pid %d exists", pid))
+			if tt.kill {
+				confirm(&stdin)
+			} else {
+				decline(&stdin)
+			}
 
-	internal.KPOP(strconv.Itoa(port), false, false, &stdin, &stdout, nil)
+			internal.KPOP(tt.port, false, false, &stdin, &stdout, mockExecutor)
+			assert.Contains(t, stdout.String(), tt.want)
+		})
+	}
+}
 
-	expected := fmt.Sprintf("Kill process on port %d (PID %d)? (y/n)", port, pid)
-	assert.Contains(t, stdout.String(), expected, "Output does not contain confirmation message")
+func decline(buf *bytes.Buffer) {
+	buf.WriteString("n\n")
+}
 
-	processExists, _ := testutils.ProcessExists(pid)
-	assert.False(t, processExists, fmt.Sprintf("Process with pid %d should have been killed", pid))
-
-	defer kill()
+func confirm(buf *bytes.Buffer) {
+	buf.WriteString("y\n")
 }

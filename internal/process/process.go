@@ -1,39 +1,25 @@
 package process
 
 import (
-	"fmt"
+	"errors"
 	"github.com/DDaaaaann/kpop-cli/internal/executor"
-	"runtime"
-	"strings"
+	"github.com/DDaaaaann/kpop-cli/internal/utils"
 )
 
-// FindProcessUsingPort fetches the process ID for a given port by executing the appropriate command.
-func FindProcessUsingPort(port string, executor executor.CommandExecutor) string {
-	var out []byte
-	var err error
-	if runtime.GOOS == "windows" {
-		out, err = executor.Execute("netstat", "-ano")
-	} else {
-		out, err = executor.Execute("lsof", "-t", "-i:"+port)
+func FindProcessUsingPort(port string, executor executor.CommandExecutor) (int, error) {
+	out, err, format := executor.FindProcessForPort(port)
+
+	if err != nil {
+		return 0, err
 	}
 
-	if err != nil || len(out) == 0 {
-		return ""
+	if len(out) == 0 {
+		return 0, errors.New("no result")
 	}
-	return strings.TrimSpace(string(out))
+
+	return utils.ParseFirstPID(out, *format)
 }
 
-// KillProcess terminates the process with the given PID.
-func KillProcess(pid string, executor executor.CommandExecutor) error {
-	var err error
-	if pid == "" {
-		return fmt.Errorf("no PID provided")
-	}
-
-	if runtime.GOOS == "windows" {
-		_, err = executor.Execute("taskkill", "/PID", pid, "/F")
-	} else {
-		_, err = executor.Execute("kill", "-9", pid)
-	}
-	return err
+func KillProcess(pid int, executor executor.CommandExecutor) bool {
+	return executor.KillProcess(pid) == nil
 }
