@@ -15,11 +15,6 @@ const (
 	FormatNetstat                            // Netstat-style output (Windows)
 )
 
-// String returns the string representation of the ProcessOutputFormat.
-func (f ProcessOutputFormat) String() string {
-	return [...]string{"FormatPIDOnly", "FormatNetstat"}[f]
-}
-
 // ParseFirstPID extracts the first PID based on the given output format.
 func ParseFirstPID(output []byte, format ProcessOutputFormat) (int, error) {
 	lines := bytes.Split(output, []byte("\n"))

@@ -1,9 +1,8 @@
-package main
+package internal
 
 import (
 	"bytes"
 	"errors"
-	"github.com/DDaaaaann/kpop-cli/internal"
 	"github.com/DDaaaaann/kpop-cli/internal/executor"
 	"github.com/DDaaaaann/kpop-cli/internal/utils"
 	"github.com/stretchr/testify/assert"
@@ -60,7 +59,7 @@ Cancelled.`,
 				decline(&stdin)
 			}
 
-			internal.KPOP(tt.port, false, false, &stdin, &stdout, mockExecutor)
+			KPOP(tt.port, false, false, &stdin, &stdout, mockExecutor)
 			assert.Contains(t, stdout.String(), tt.want)
 		})
 	}
