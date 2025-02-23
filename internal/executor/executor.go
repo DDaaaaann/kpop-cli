@@ -1,30 +1,67 @@
 package executor
 
-import "os/exec"
+import (
+	"fmt"
+	"github.com/DDaaaaann/kpop-cli/internal/utils"
+	"os/exec"
+	"runtime"
+	"strconv"
+)
 
 type CommandExecutor interface {
-	Execute(name string, arg ...string) ([]byte, error)
+	FindProcessForPort(port string) ([]byte, error, *utils.ProcessOutputFormat)
+	KillProcess(pid int) error
 }
 
 type RealCommandExecutor struct{}
 
-func (r *RealCommandExecutor) Execute(name string, arg ...string) ([]byte, error) {
-	cmd := exec.Command(name, arg...)
-	return cmd.Output()
+func (r *RealCommandExecutor) KillProcess(pid int) error {
+	var err error
+
+	switch runtime.GOOS {
+	case "darwin", "linux":
+		_, err = exec.Command("kill", "-9", strconv.Itoa(pid)).Output()
+	case "windows":
+		_, err = exec.Command("taskkill", "/PID", strconv.Itoa(pid), "/F").Output()
+	default:
+		panic(fmt.Sprintf("Unsupported OS: %s", runtime.GOOS))
+	}
+
+	return err
 }
 
-func MockCmdExecutor(output string, err error) CommandExecutor {
-	return &MockCommandExecutor{Output: output, Err: err}
+func (r *RealCommandExecutor) FindProcessForPort(port string) ([]byte, error, *utils.ProcessOutputFormat) {
+	switch runtime.GOOS {
+	case "darwin", "linux":
+		output, err := exec.Command("lsof", "-t", "-i:"+port).Output()
+		format := utils.FormatPIDOnly
+		return output, err, &format
+	case "windows":
+		output, err := exec.Command("netstat", "-ano").Output()
+		format := utils.FormatNetstat
+		return output, err, &format
+	default:
+		panic(fmt.Sprintf("Unsupported OS: %s", runtime.GOOS))
+	}
+}
+
+func MockCmdExecutor(output []byte, err error, format utils.ProcessOutputFormat) CommandExecutor {
+	return &MockCommandExecutor{Output: output, Err: err, Format: &format}
 }
 
 type MockCommandExecutor struct {
-	Output string
+	Output []byte
 	Err    error
+	Format *utils.ProcessOutputFormat
 }
 
-func (m *MockCommandExecutor) Execute(name string, arg ...string) ([]byte, error) {
+func (m *MockCommandExecutor) FindProcessForPort(port string) ([]byte, error, *utils.ProcessOutputFormat) {
 	if m.Err != nil {
-		return nil, m.Err
+		return nil, m.Err, nil
 	}
-	return []byte(m.Output), nil
+	return m.Output, nil, m.Format
+}
+
+func (m *MockCommandExecutor) KillProcess(pid int) error {
+	return m.Err
 }
