@@ -33,12 +33,38 @@ jobs:
         run: |
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o dist/kpop-cli-${{ matrix.os }}-${{ matrix.arch }} ./cmd/kpop
 
+      - name: Upload Binaries for E2E Testing
+        uses: actions/upload-artifact@v3
+        with:
+          name: cli-binaries
+          path: dist/
+
+  e2e-test:
+    needs: build-matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ linux, windows, darwin ]
+        arch: [ amd64, arm64 ]
+    steps:
+      - name: Download CLI Binaries
+        uses: actions/download-artifact@v3
+        with:
+          name: cli-binaries
+          path: dist/
+
       - name: Run E2E tests
         run: go test -v -tags=e2e ./internal
 
+      - name: Delete Artifacts on Failure
+        if: failure()
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: cli-binaries
+
   publish:
     name: Publish Artifact
-    needs: build-matrix
+    needs: e2e-test
     runs-on: ubuntu-latest
     strategy:
       matrix:
