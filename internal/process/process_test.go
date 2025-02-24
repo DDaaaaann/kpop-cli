@@ -14,7 +14,7 @@ func TestFindProcess_Error(t *testing.T) {
 
 	port, err := process.FindProcessUsingPort("8080", mockExecutor)
 	assert.Error(t, err)
-	assert.Equal(t, "errors", err.Error())
+	assert.Equal(t, "error", err.Error())
 	assert.Equal(t, port, 0)
 }
 
