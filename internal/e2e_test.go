@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net"
+	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -79,9 +80,11 @@ func startTestServer() (int, int, func()) {
 	go func() {
 		cmd := exec.Command("python3", "-m", "http.server", strconv.Itoa(port))
 
+		cmd.Stdout = os.Stdout
+
 		cmdErr := cmd.Start()
 		if cmdErr != nil {
-			log.Fatal(cmdErr)
+			log.Fatal(cmdErr.Error())
 		}
 
 		resultCmd <- cmd // Send the result to the channel
@@ -89,8 +92,6 @@ func startTestServer() (int, int, func()) {
 
 	cmd := <-resultCmd
 	pid := cmd.Process.Pid
-
-	log.Printf("Just started test server on subprocess %d.\n", pid)
 
 	time.Sleep(500 * time.Millisecond) // Allow server to start
 
