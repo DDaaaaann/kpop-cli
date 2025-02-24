@@ -21,8 +21,8 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Download dependencies
-        run: go mod download
+      - name: Install dependencies
+        run: go mod tidy
 
       - name: Run unit and integration tests
         run: go test -race ./...
@@ -45,6 +45,9 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: "go.mod"
+
+      - name: Install dependencies
+        run: go mod tidy
 
       - name: Build executable
         run: make build
