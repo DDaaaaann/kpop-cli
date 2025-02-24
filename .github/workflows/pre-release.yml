@@ -38,7 +38,7 @@ jobs:
 
   publish:
     name: Publish Artifact
-    needs: e2e-test
+    needs: build-matrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
