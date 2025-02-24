@@ -1,5 +1,5 @@
 name: Unit and Integration Tests
-on: [push, pull_request]
+on: pull_request
 
 permissions:
   contents: read
