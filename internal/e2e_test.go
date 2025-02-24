@@ -78,8 +78,11 @@ func startTestServer() (int, int, func()) {
 	}
 
 	go func() {
-		cmd := exec.Command("python3", "-m", "http.server", strconv.Itoa(port))
-
+		if runtime.GOOS == "windows" {
+			cmd := exec.Command("python", "-m", "http.server", strconv.Itoa(port))
+		} else {
+			cmd := exec.Command("python3", "-m", "http.server", strconv.Itoa(port))
+		}
 		cmd.Stdout = os.Stdout
 
 		cmdErr := cmd.Start()
