@@ -1,5 +1,3 @@
-//go:build e2e
-
 package internal
 
 import (
@@ -102,15 +100,31 @@ func startTestServer() (int, int, func()) {
 }
 
 func getBinaryPath() string {
-	basePath := "../dist/kpop-cli"
+	binaryName := "kpop-cli"
+
 	switch runtime.GOOS {
-	case "darwin":
-		return basePath + "-darwin-amd64"
 	case "linux":
-		return basePath + "-linux-amd64"
+		binaryName += "-linux"
 	case "windows":
-		return basePath + "-windows-amd64.exe"
+		binaryName += "-windows"
+	case "darwin":
+		binaryName += "-darwin"
 	default:
 		panic(fmt.Sprintf("Unsupported OS: %s", runtime.GOOS))
 	}
+
+	switch runtime.GOARCH {
+	case "amd64":
+		binaryName += "-amd64"
+	case "arm64":
+		binaryName += "-arm64"
+	default:
+		panic(fmt.Sprintf("Unsupported architecture: %s", runtime.GOARCH))
+	}
+
+	if runtime.GOOS == "windows" {
+		binaryName += ".exe"
+	}
+
+	return fmt.Sprintf("../dist/%s", binaryName)
 }

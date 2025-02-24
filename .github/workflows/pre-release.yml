@@ -29,37 +29,27 @@ jobs:
       - name: Run unit tests
         run: go test -v ./...
 
-      - name: Build binary
+      - name: Build binaries
         run: |
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o kpop-cli-${{ matrix.os }}-${{ matrix.arch }} ./cmd/kpop
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o dist/kpop-cli-${{ matrix.os }}-${{ matrix.arch }} ./cmd/kpop
+
+      - name: Run E2E tests
+        run: go test -v -tags=e2e ./internal
+
+  publish:
+    name: Publish Artifact
+    needs: e2e-test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ linux, windows, darwin ]
+        arch: [ amd64, arm64 ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: kpop-cli-${{ matrix.os }}-${{ matrix.arch }}
-          path: kpop-cli-${{ matrix.os }}-${{ matrix.arch }}
-
-  e2e-test:
-    name: E2E Test
-    needs: build-matrix
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: stable
-
-      - name: Download binary
-        uses: actions/download-artifact@v4
-        with:
-          name: kpop-cli-${{ matrix.os }}-${{ matrix.arch }}
-          path: .
-
-      - name: Run E2E tests
-        run: go test -v -tags=e2e ./internal
+          path: dist/kpop-cli-${{ matrix.os }}-${{ matrix.arch }}
