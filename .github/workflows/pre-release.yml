@@ -31,7 +31,7 @@ jobs:
 
       - name: Build binary
         run: |
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o kpop-cli-${{ matrix.os }}-${{ matrix.arch }}
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o kpop-cli-${{ matrix.os }}-${{ matrix.arch }} ./cmd/kpop
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
