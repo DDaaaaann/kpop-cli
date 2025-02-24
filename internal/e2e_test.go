@@ -19,11 +19,13 @@ import (
 func TestKpopCLI_success(t *testing.T) {
 	var stdout bytes.Buffer
 	port, pid, kill := startTestServer()
+	log.Printf("Started test server on port %d and pid %d.\n", port, pid)
 
 	exists, _ := processExists(pid)
 	assert.True(t, exists, fmt.Sprintf("No process with pid %d exists", pid))
 
 	binaryPath := getBinaryPath()
+	log.Printf("Running e2e-test for binary '%s'", binaryPath)
 
 	kpopCmd := exec.Command(binaryPath, "-f", strconv.Itoa(port))
 	kpopCmd.Stdout = &stdout
@@ -88,7 +90,7 @@ func startTestServer() (int, int, func()) {
 	cmd := <-resultCmd
 	pid := cmd.Process.Pid
 
-	log.Printf("Just started subprocess %d.\n", pid)
+	log.Printf("Just started test server on subprocess %d.\n", pid)
 
 	time.Sleep(500 * time.Millisecond) // Allow server to start
 
