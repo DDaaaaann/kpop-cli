@@ -34,12 +34,13 @@ jobs:
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o dist/kpop-cli-${{ matrix.os }}-${{ matrix.arch }} ./cmd/kpop
 
       - name: Upload Binaries for E2E Testing
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cli-binaries
           path: dist/
 
   e2e-test:
+    name: End-to-End Test
     needs: build-matrix
     runs-on: ${{ matrix.os }}
     strategy:
@@ -63,7 +64,7 @@ jobs:
           name: cli-binaries
 
   publish:
-    name: Publish Artifact
+    name: Publish Artifacts
     needs: e2e-test
     runs-on: ubuntu-latest
     strategy:
