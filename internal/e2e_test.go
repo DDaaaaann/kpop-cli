@@ -80,11 +80,12 @@ func startTestServer() (int, int, func()) {
 	go func() {
 		var cmd *exec.Cmd
 		if runtime.GOOS == "windows" {
-			cmd = exec.Command("cmd", "/C", "python", "-m", "http.server", strconv.Itoa(port))
+			cmd = exec.Command("python", "-m", "http.server", strconv.Itoa(port))
 		} else {
 			cmd = exec.Command("python3", "-m", "http.server", strconv.Itoa(port))
 		}
 		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 
 		cmdErr := cmd.Start()
 		if cmdErr != nil {
@@ -100,10 +101,10 @@ func startTestServer() (int, int, func()) {
 	time.Sleep(500 * time.Millisecond) // Allow server to start
 
 	return port, pid, func() {
-		err := cmd.Process.Kill()
-		if err != nil {
-			fmt.Printf("Killing subprocess with pid: %d", pid)
-			return
+		if err := cmd.Process.Kill(); err == nil {
+			fmt.Printf("Force-killed PID %d\n", pid)
+		} else {
+			fmt.Printf("Successfully stopped PID %d gracefully\n", pid)
 		}
 	}
 }
