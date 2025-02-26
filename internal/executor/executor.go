@@ -37,7 +37,7 @@ func (r *RealCommandExecutor) FindProcessForPort(port string) ([]byte, error, *u
 		format := utils.FormatPIDOnly
 		return output, err, &format
 	case "windows":
-		output, err := exec.Command("netstat", "-ano").Output()
+		output, err := exec.Command("cmd", "/C", "netstat", "-ano", "|", "findstr", ":"+port).Output()
 		format := utils.FormatNetstat
 		return output, err, &format
 	default:

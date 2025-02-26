@@ -6,7 +6,7 @@ VERSION := 1.0.0
 
 # Run app
 run:
-	go run cmd/kill-port/main.go 12345
+	go run cmd/kpop/main.go 12345
 
 # Install dependencies
 deps:
@@ -14,9 +14,12 @@ deps:
 
 # Build binaries for all platforms
 build:
-	GOOS=linux GOARCH=amd64 go build -o dist/$(BINARY_NAME)-linux-amd64 ./cmd/kill-port
-	GOOS=darwin GOARCH=amd64 go build -o dist/$(BINARY_NAME)-darwin-amd64 ./cmd/kill-port
-	GOOS=windows GOARCH=amd64 go build -o dist/$(BINARY_NAME)-windows-amd64.exe ./cmd/kill-port
+	GOOS=linux GOARCH=amd64 go build -o dist/$(BINARY_NAME)-linux-amd64 ./cmd/kpop
+	GOOS=linux GOARCH=arm64 go build -o dist/$(BINARY_NAME)-linux-arm64 ./cmd/kpop
+	GOOS=darwin GOARCH=amd64 go build -o dist/$(BINARY_NAME)-darwin-amd64 ./cmd/kpop
+	GOOS=darwin GOARCH=arm64 go build -o dist/$(BINARY_NAME)-darwin-arm64 ./cmd/kpop
+	GOOS=windows GOARCH=amd64 go build -o dist/$(BINARY_NAME)-windows-amd64.exe ./cmd/kpop
+	GOOS=windows GOARCH=arm64 go build -o dist/$(BINARY_NAME)-windows-arm64.exe ./cmd/kpop
 
 # Run tests
 test:

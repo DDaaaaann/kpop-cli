@@ -13,7 +13,7 @@ var quietFlag = flag.Bool("q", false, "Quiet mode, suppress output")
 var realExecutor = executor.RealCommandExecutor{}
 
 func usage() {
-	fmt.Println("Usage: kill-port [-f] [-q] <port>")
+	fmt.Println("Usage: kpop [-f] [-q] <port>")
 	fmt.Println("Options:")
 	fmt.Println("  -f    Force kill without confirmation")
 	fmt.Println("  -q    Quiet mode, suppress output")
