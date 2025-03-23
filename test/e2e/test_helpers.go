@@ -55,6 +55,8 @@ func printExecutable(pid int) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Process Pid", process.Pid())
+	fmt.Println("Process PPid", process.PPid())
 	fmt.Println("Process Executable:", process.Executable())
 }
 
