@@ -3,7 +3,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/DDaaaaann/kpop-cli">
-    <img src="assets/logo.jpg" alt="Logo" width="400" height="400">
+    <img src="https://github.com/user-attachments/assets/64e25e73-8450-4032-967d-06402a7b76b9" alt="Logo" width="400" height="400">
   </a>
 
 <h3 align="center">KPOP-CLI</h3>
