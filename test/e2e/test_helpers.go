@@ -47,6 +47,9 @@ func startServerWithCmd(cmd *exec.Cmd, port int) (int, int, func()) {
 }
 
 func printExecutable(pid int) {
+	out, err := exec.Command("netstat", "-ano").Output()
+	fmt.Println(out, err)
+
 	process, err := ps.FindProcess(pid)
 	if err != nil {
 		log.Fatal(err)
