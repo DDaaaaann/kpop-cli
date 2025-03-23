@@ -23,7 +23,7 @@ func TestKpopCLI_success(t *testing.T) {
 	binaryPath := getBinaryPath()
 	log.Printf("Running e2e-test for binary '%s'", binaryPath)
 
-	kpopCmd := getCommand(binaryPath, port)
+	kpopCmd := execCommand(binaryPath, port)
 	kpopCmd.Stdout = &stdout
 
 	err := kpopCmd.Run()

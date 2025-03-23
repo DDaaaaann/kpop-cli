@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -86,20 +87,18 @@ func getBinaryPath() string {
 func processExists(pid int) (bool, error) {
 	var out []byte
 	var err error
-
 	if runtime.GOOS == "windows" {
-		out, err = exec.Command("tasklist", "/FI", fmt.Sprintf("PID eq %d", pid)).Output()
+		out, err = exec.Command("netstat", "-ano").Output()
 	} else {
-		out, err = exec.Command("ps", "-p", strconv.Itoa(pid)).Output()
+		out, err = exec.Command("lsof", "-p", strconv.Itoa(pid)).Output()
 	}
-
 	if err != nil || len(out) == 0 {
 		return false, err
 	}
 
-	return true, nil
+	return strings.Contains(string(out), strconv.Itoa(pid)), nil
 }
 
-func getCommand(binaryPath string, port int) *exec.Cmd {
+func execCommand(binaryPath string, port int) *exec.Cmd {
 	return exec.Command(binaryPath, "-f", strconv.Itoa(port))
 }
