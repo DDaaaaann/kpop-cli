@@ -33,18 +33,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Check and install netstat if missing
-        run: |
-            if ! command -v netstat &> /dev/null; then
-            echo "❌ netstat not found, installing..."
-            sudo apt-get update
-            sudo apt-get install -y net-tools
-            else
-            echo "✅ netstat already installed!"
-            fi
-
-            - name: Verify netstat works
-              run: netstat -an
+      - name: Verify netstat works
+        run: netstat -an
       - name: Check out code
         uses: actions/checkout@v4
 
