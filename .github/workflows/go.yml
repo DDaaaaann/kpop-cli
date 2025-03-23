@@ -47,11 +47,11 @@ jobs:
       - name: Build executable
         run: make build
 
-      - name: Run end-to-end test
-        shell: bash
-        run: |
-          chmod +x ./test/e2e-test.sh
-          ./test/e2e-test.sh "${{ matrix.os }}"
+#      - name: Run end-to-end test
+#        shell: bash
+#        run: |
+#          chmod +x ./test/e2e-test.sh
+#          ./test/e2e-test.sh "${{ matrix.os }}"
 
-#      - name: Run E2E tests
-#        run: go test -v -tags=e2e ./internal
+      - name: Run E2E tests
+        run: go test -v -tags=e2e ./test/e2e/...
