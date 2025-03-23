@@ -5,6 +5,7 @@ package e2e
 
 import (
 	"fmt"
+	"github.com/mitchellh/go-ps"
 	"log"
 	"net"
 	"os"
@@ -34,6 +35,7 @@ func startServerWithCmd(cmd *exec.Cmd, port int) (int, int, func()) {
 	pid := cmdResult.Process.Pid
 
 	time.Sleep(500 * time.Millisecond)
+	printExecutable(pid)
 
 	return port, pid, func() {
 		if err := cmdResult.Process.Kill(); err == nil {
@@ -42,6 +44,14 @@ func startServerWithCmd(cmd *exec.Cmd, port int) (int, int, func()) {
 			fmt.Printf("Successfully stopped PID %d gracefully\n", pid)
 		}
 	}
+}
+
+func printExecutable(pid int) {
+	process, err := ps.FindProcess(pid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Process Executable:", process.Executable())
 }
 
 func getFreePort() (int, error) {
