@@ -1,0 +1,51 @@
+name: Unit and Integration Tests
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run unit and integration tests
+        run: go test -race ./...
+
+      - name: Build
+        run: go build -v ./cmd/kpop
+
+  integration-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Build executable
+        run: make build
+
+      - name: Run E2E tests
+        run: go test -v -tags=e2e ./internal
