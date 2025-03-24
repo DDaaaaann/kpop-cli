@@ -35,6 +35,14 @@ jobs:
     steps:
       - name: Verify netstat works
         run: netstat -an
+      - name: Start HTTP server (IPv4)
+        run: |
+          python -m http.server 8000 --bind 127.0.0.1
+          sleep 3
+          echo "Checking if Python server is running..."
+          netstat -ano | findstr 8000
+          tasklist | findstr python
+
       - name: Check out code
         uses: actions/checkout@v4
 
