@@ -34,7 +34,7 @@ func startServerWithCmd(cmd *exec.Cmd, port int) (int, int, func()) {
 	cmdResult := <-resultCmd
 	pid := cmdResult.Process.Pid
 
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(3000 * time.Millisecond)
 	printExecutable(pid)
 
 	return port, pid, func() {
