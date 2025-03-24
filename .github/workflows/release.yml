@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*.*.*'   # Only on version tags (e.g., v1.0.0)
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -23,4 +26,4 @@ jobs:
           version: latest
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GORELEASER_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
