@@ -15,7 +15,7 @@ func startTestServer() (int, int, func()) {
 		panic(err)
 	}
 
-	cmd := exec.Command("python", "-m", "http.server", "--bind", "::", strconv.Itoa(port))
+	cmd := exec.Command("python", "-m", "http.server", strconv.Itoa(port), "--bind", "127.0.0.1")
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP,
 	}
