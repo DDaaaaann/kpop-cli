@@ -22,3 +22,5 @@ go.sum
 # System-specific files
 .DS_Store  # macOS files
 Thumbs.db  # Windows files
+# Added by goreleaser init:
+dist/
