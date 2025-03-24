@@ -34,7 +34,10 @@ func startServerWithCmd(cmd *exec.Cmd, port int) (int, int, func()) {
 	cmdResult := <-resultCmd
 	pid := cmdResult.Process.Pid
 
-	time.Sleep(3000 * time.Millisecond)
+	if !waitForPort(port, 10*time.Second) {
+		log.Fatal("Server never came up!")
+	}
+
 	printExecutable(pid)
 
 	return port, pid, func() {
@@ -44,6 +47,22 @@ func startServerWithCmd(cmd *exec.Cmd, port int) (int, int, func()) {
 			fmt.Printf("Successfully stopped PID %d gracefully\n", pid)
 		}
 	}
+}
+
+func waitForPort(port int, timeout time.Duration) bool {
+	address := fmt.Sprintf("127.0.0.1:%d", port)
+	deadline := time.Now().Add(timeout)
+
+	for time.Now().Before(deadline) {
+		fmt.Printf("Waiting for port %d...\n", port)
+		conn, err := net.DialTimeout("tcp", address, time.Second)
+		if err == nil {
+			conn.Close()
+			return true
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	return false
 }
 
 func printExecutable(pid int) {
