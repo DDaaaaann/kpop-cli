@@ -8,13 +8,13 @@ import (
 	"strconv"
 )
 
-func startTestServer() (int, int, func()) {
+func startTestServer(bindAddress string) (int, int, func()) {
 	port, err := getFreePort()
 	if err != nil {
 		panic(err)
 	}
 
-	cmd := exec.Command("python3", "-m", "http.server", strconv.Itoa(port))
+	cmd := exec.Command("python", "-m", "http.server", strconv.Itoa(port), "--bind", bindAddress)
 
-	return startServerWithCmd(cmd, port)
+	return startServerWithCmd(cmd, bindAddress, port)
 }

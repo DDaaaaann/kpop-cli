@@ -9,16 +9,16 @@ import (
 	"syscall"
 )
 
-func startTestServer() (int, int, func()) {
+func startTestServer(bindAddress string) (int, int, func()) {
 	port, err := getFreePort()
 	if err != nil {
 		panic(err)
 	}
 
-	cmd := exec.Command("python", "-m", "http.server", strconv.Itoa(port), "--bind", "127.0.0.1")
+	cmd := exec.Command("python", "-m", "http.server", strconv.Itoa(port), "--bind", bindAddress)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP,
 	}
 
-	return startServerWithCmd(cmd, port)
+	return startServerWithCmd(cmd, bindAddress, port)
 }

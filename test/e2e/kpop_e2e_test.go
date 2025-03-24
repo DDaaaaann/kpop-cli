@@ -11,10 +11,12 @@ import (
 	"testing"
 )
 
+const BindAddress = "127.0.0.1"
+
 func TestKpopCLI_success(t *testing.T) {
 	var stdout bytes.Buffer
 
-	port, pid, kill := startTestServer()
+	port, pid, kill := startTestServer(BindAddress)
 	log.Printf("Started test server on port %d and pid %d.\n", port, pid)
 
 	exists, _ := processExists(pid)

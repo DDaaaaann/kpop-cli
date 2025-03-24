@@ -5,7 +5,6 @@ package e2e
 
 import (
 	"fmt"
-	"github.com/mitchellh/go-ps"
 	"log"
 	"net"
 	"os"
@@ -16,7 +15,7 @@ import (
 	"time"
 )
 
-func startServerWithCmd(cmd *exec.Cmd, port int) (int, int, func()) {
+func startServerWithCmd(cmd *exec.Cmd, bindAddress string, port int) (int, int, func()) {
 	resultCmd := make(chan *exec.Cmd)
 
 	go func() {
@@ -34,11 +33,9 @@ func startServerWithCmd(cmd *exec.Cmd, port int) (int, int, func()) {
 	cmdResult := <-resultCmd
 	pid := cmdResult.Process.Pid
 
-	if !waitForPort(port, 10*time.Second) {
+	if !waitForPort(bindAddress, port, 10*time.Second) {
 		log.Fatal("Server never came up!")
 	}
-
-	printExecutable(pid)
 
 	return port, pid, func() {
 		if err := cmdResult.Process.Kill(); err == nil {
@@ -49,8 +46,8 @@ func startServerWithCmd(cmd *exec.Cmd, port int) (int, int, func()) {
 	}
 }
 
-func waitForPort(port int, timeout time.Duration) bool {
-	address := fmt.Sprintf("127.0.0.1:%d", port)
+func waitForPort(bindAddress string, port int, timeout time.Duration) bool {
+	address := fmt.Sprintf("%s:%d", bindAddress, port)
 	deadline := time.Now().Add(timeout)
 
 	for time.Now().Before(deadline) {
@@ -63,20 +60,6 @@ func waitForPort(port int, timeout time.Duration) bool {
 		time.Sleep(500 * time.Millisecond)
 	}
 	return false
-}
-
-func printExecutable(pid int) {
-	out, err := exec.Command("netstat", "-ano").Output()
-	fmt.Println("Error: ", err)
-	fmt.Println(string(out))
-
-	process, err := ps.FindProcess(pid)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Process Pid", process.Pid())
-	fmt.Println("Process PPid", process.PPid())
-	fmt.Println("Process Executable:", process.Executable())
 }
 
 func getFreePort() (int, error) {
