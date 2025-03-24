@@ -17,9 +17,12 @@ import (
 	"time"
 )
 
+const BindAddress = "127.0.0.1"
+
 func TestKpopCLI_success(t *testing.T) {
 	var stdout bytes.Buffer
-	port, pid, kill := startTestServer()
+
+	port, pid, kill := startTestServer(BindAddress)
 	log.Printf("Started test server on port %d and pid %d.\n", port, pid)
 
 	exists, _ := processExists(pid)
@@ -69,7 +72,7 @@ func getFreePort() (int, error) {
 }
 
 // startTestServer runs a simple HTTP server on a free port
-func startTestServer() (int, int, func()) {
+func startTestServer(bindAddress string) (int, int, func()) {
 	resultCmd := make(chan *exec.Cmd)
 	port, err := getFreePort()
 
@@ -80,9 +83,9 @@ func startTestServer() (int, int, func()) {
 	go func() {
 		var cmd *exec.Cmd
 		if runtime.GOOS == "windows" {
-			cmd = exec.Command("python", "-m", "http.server", strconv.Itoa(port))
+			cmd = exec.Command("python", "-m", "http.server", strconv.Itoa(port), "--bind", bindAddress)
 		} else {
-			cmd = exec.Command("python3", "-m", "http.server", strconv.Itoa(port))
+			cmd = exec.Command("python3", "-m", "http.server", strconv.Itoa(port), "--bind", bindAddress)
 		}
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -98,7 +101,9 @@ func startTestServer() (int, int, func()) {
 	cmd := <-resultCmd
 	pid := cmd.Process.Pid
 
-	time.Sleep(500 * time.Millisecond) // Allow server to start
+	if !waitForPort(bindAddress, port, 10*time.Second) {
+		log.Fatal("Server never came up!")
+	}
 
 	return port, pid, func() {
 		if err := cmd.Process.Kill(); err == nil {
@@ -137,4 +142,20 @@ func getBinaryPath() string {
 	}
 
 	return fmt.Sprintf("../dist/%s", binaryName)
+}
+
+func waitForPort(bindAddress string, port int, timeout time.Duration) bool {
+	address := fmt.Sprintf("%s:%d", bindAddress, port)
+	deadline := time.Now().Add(timeout)
+
+	for time.Now().Before(deadline) {
+		fmt.Printf("Waiting for port %d...\n", port)
+		conn, err := net.DialTimeout("tcp", address, time.Second)
+		if err == nil {
+			conn.Close()
+			return true
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	return false
 }
