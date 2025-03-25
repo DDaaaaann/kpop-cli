@@ -53,33 +53,74 @@ developers who encounter errors stating that a port is already in use.
 
 ## Installation
 
-### Using APT (Debian/Ubuntu)
+You can install `kpop` in different ways, depending on your OS and preference.
 
-```bash
-sudo apt install kpop-cli
+### Package Managers (Coming Soon)
+Support for package managers is coming soon. You will be able to install `kpop` using:
+- **Homebrew (macOS & Linux)**: `brew install DDaaaaann/kpop-cli/kpop`
+- **APT (Debian/Ubuntu)**: `sudo apt install kpop`
+- **Winget (Windows)**: `winget install kpop`
+
+
+### Quick Install Using Shell Script
+Run the following command to install `kpop` automatically:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/DDaaaaann/kpop-cli/main/install.sh | bash
 ```
 
-### Using Homebrew (macOS)
+This script will:
+- Detect your OS and architecture.
+- Download the latest version from GitHub.
+- Install `kpop` in a local user directory (`~/.local/bin` on Linux/macOS, `~/.kpop/bin` on Windows).
+- Add it to your `PATH` (or guide you on how to do so).
 
-```bash
-brew install DDaaaaann/kpop-cli/kpop-cli
+Once installed, run:
+
+```sh
+kpop --help
 ```
 
-### Using Winget (Windows)
+### Manual Installation
+If you prefer to install manually:
 
-```bash
-winget install DDaaaaann.kpop-cli
+1. Download the latest release from [GitHub Releases](https://github.com/DDaaaaann/kpop-cli/releases/latest).
+2. Extract the binary:
+   ```sh
+   tar -xzf kpop_linux_amd64.tar.gz  # Replace with the correct OS/architecture
+   ```
+3. Move it to a directory in your `PATH`, e.g.:
+   ```sh
+   mv kpop ~/.local/bin/
+   chmod +x ~/.local/bin/kpop
+   ```
+
+For Windows, download the `.zip`, extract `kpop.exe`, and place it in a folder like `C:\Users\YourName\.kpop\bin`.
+
+
+## Updating `kpop`
+To update to the latest version, simply re-run the installation script:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/DDaaaaann/kpop-cli/main/install.sh | bash
 ```
 
-### From source
+Or, if installed via Homebrew (once available):
 
-To install the tool from source, clone the repository and build it:
-
-```bash
-git clone https://github.com/DDaaaaann/kpop-cli.git
-cd kpop-cli
-go build
+```sh
+brew upgrade kpop
 ```
+
+
+### Uninstallation
+To remove `kpop`:
+
+```sh
+rm -rf ~/.local/bin/kpop ~/.local/share/kpop-cli  # Linux/macOS
+rm -rf ~/.kpop/bin/kpop.exe ~/.kpop/bin/share/kpop-cli  # Windows
+```
+
+If you manually added `kpop` to `PATH`, remove the entry from your shell profile.
 
 ## Usage
 
@@ -107,7 +148,6 @@ To see usage instructions, run:
 
 ```bash
 kpop -h or kpop --help
-
 ```
 
 ## Example
@@ -116,15 +156,6 @@ To kill a process running on port 8080:
 
 ```bash
 $ kpop 8080
-Kill process using port 8080 (PID 12345)? (y/n)
-Killed process 12345 on port 8080.
-```
-
-If you run into an "address already in use" error while starting a server, use the autodetect
-feature:
-
-```bash
-$ kpop
 Kill process using port 8080 (PID 12345)? (y/n)
 Killed process 12345 on port 8080.
 ```
