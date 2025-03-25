@@ -27,6 +27,17 @@ elif [[ "$ARCH" == "aarch64" ]]; then
     ARCH="arm64"
 fi
 
+# Set up Windows environment
+if [[ "$OS" == "darwin" || "$OS" == "linux" ]]; then
+    TARBALL="${BIN_NAME}_${OS}_${ARCH}.tar.gz"
+    INSTALL_METHOD="tarball"
+else
+    # Windows: We'll need a .zip for Windows
+    OS="windows"
+    TARBALL="${BIN_NAME}_${OS}_${ARCH}.zip"
+    INSTALL_METHOD="zip"
+fi
+
 # Fetch latest version by following GitHub redirect
 LATEST_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/DDaaaaann/kpop-cli/releases/latest | grep -oE "[^/]+$")
 
@@ -35,14 +46,24 @@ if [[ -z "$LATEST_VERSION" ]]; then
     exit 1
 fi
 
-# Construct tarball name based on GoReleaser naming convention
-TARBALL="${BIN_NAME}_${OS}_${ARCH}.tar.gz"
-
 # Choose installation location
 echo -e "${WHITE}Choose installation method:${NC}"
 echo -e "1) ${GREEN}Install to user directory ($DEFAULT_INSTALL_DIR) [Recommended]${NC}"
 echo -e "2) ${YELLOW}Install system-wide ($SYSTEM_INSTALL_DIR) [Requires sudo]${NC}"
-read -p "Enter option (1 or 2): " OPTION
+
+# Check if we are in interactive mode (for piping)
+if [ -t 0 ]; then
+    read -p "Enter option (1 or 2): " OPTION
+else
+    # If not interactive, continue to ask for input
+    while true; do
+        echo -e "${RED}You must provide a valid option (1 or 2). Please try again.${NC}"
+        read -p "Enter option (1 or 2): " OPTION
+        if [[ "$OPTION" == "1" || "$OPTION" == "2" ]]; then
+            break
+        fi
+    done
+fi
 
 if [[ "$OPTION" == "2" ]]; then
     INSTALL_DIR="$SYSTEM_INSTALL_DIR"
@@ -57,22 +78,28 @@ fi
 $SUDO mkdir -p "$INSTALL_DIR"
 $SUDO mkdir -p "$README_INSTALL_DIR"
 
-# Download the tar.gz file
+# Download the appropriate tarball or zip based on OS
 echo -e "${YELLOW}⚡ Downloading $TARBALL...${NC}"
 curl -L -o "/tmp/$TARBALL" "https://github.com/DDaaaaann/kpop-cli/releases/download/$LATEST_VERSION/$TARBALL"
 
-# Extract the binary and README
-echo -e "${YELLOW}⚡ Extracting $BIN_NAME and $README_FILE...${NC}"
-tar -xzf "/tmp/$TARBALL" -C "/tmp/"
+# Extract or unzip the file based on the OS
+if [[ "$INSTALL_METHOD" == "tarball" ]]; then
+    echo -e "${YELLOW}⚡ Extracting $BIN_NAME and $README_FILE...${NC}"
+    tar -xzf "/tmp/$TARBALL" -C "/tmp/"
+    # Move the binary and README file to the appropriate location
+    $SUDO mv "/tmp/$BIN_NAME" "$INSTALL_DIR/$BIN_NAME"
+    $SUDO chmod +x "$INSTALL_DIR/$BIN_NAME"
+    $SUDO mv "/tmp/$README_FILE" "$README_INSTALL_DIR/$README_FILE"
+elif [[ "$INSTALL_METHOD" == "zip" ]]; then
+    echo -e "${YELLOW}⚡ Unzipping $BIN_NAME and $README_FILE...${NC}"
+    unzip -q "/tmp/$TARBALL" -d "/tmp/"
+    # Move the binary and README file to the appropriate location
+    $SUDO mv "/tmp/$BIN_NAME.exe" "$INSTALL_DIR/$BIN_NAME.exe"
+    $SUDO mv "/tmp/$README_FILE" "$README_INSTALL_DIR/$README_FILE"
+    # Windows-specific: No need for chmod on .exe files
+fi
 
-# Move the binary to the install directory
-$SUDO mv "/tmp/$BIN_NAME" "$INSTALL_DIR/$BIN_NAME"
-$SUDO chmod +x "$INSTALL_DIR/$BIN_NAME"
-
-# Move the README file to the appropriate directory
-$SUDO mv "/tmp/$README_FILE" "$README_INSTALL_DIR/$README_FILE"
-
-# Clean up
+# Clean up the temporary downloaded file
 rm "/tmp/$TARBALL"
 
 # Add to PATH if needed
