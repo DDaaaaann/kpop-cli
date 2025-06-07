@@ -11,14 +11,14 @@
   <p align="center">
     A CLI solution to kill any process on any port!
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Installation »</strong></a>
+    <a href="#installation"><strong>Installation »</strong></a>
     <br />
     <br />
     <a href="#usage">Usage</a>
     ·
-    <a href="https://github.com/DDaaaaann/kpop-cli/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/DDaaaaann/kpop-cli/issues/new?labels=Bug">Report Bug</a>
     ·
-    <a href="https://github.com/DDaaaaann/kpop-cli/issues/new?labels=improvement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/DDaaaaann/kpop-cli/issues/new?labels=Improvement">Request Feature</a>
   </p>
 </div>
 
