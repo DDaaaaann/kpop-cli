@@ -26,7 +26,7 @@ if [[ "$OS" == "mingw"* || "$OS" == "cygwin" || "$OS" == "msys" ]]; then
     OS="windows"
     EXT=".exe"
     TARBALL="${BIN_NAME}_${OS}_${ARCH}.zip"
-    INSTALL_DIR="$HOME/.kpop/bin"
+    INSTALL_DIR=$(powershell.exe -Command "echo \$env:USERPROFILE\.kpop\bin" | tr -d '\r')
 else
     EXT=""
     TARBALL="${BIN_NAME}_${OS}_${ARCH}.tar.gz"
@@ -71,8 +71,8 @@ rm "/tmp/$TARBALL"
 # Add to PATH
 if [[ "$OS" == "windows" ]]; then
     if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
-        echo -e "${YELLOW}⚡ Adding $INSTALL_DIR to your PATH...${NC}"
         WINDOWS_PATH=$(echo "$INSTALL_DIR" | sed 's/\//\\/g')
+        echo -e "${YELLOW}⚡ Adding $WINDOWS_PATH to your PATH...${NC}"
         powershell.exe -Command "[System.Environment]::SetEnvironmentVariable('Path', \$env:Path + ';$WINDOWS_PATH', [System.EnvironmentVariableTarget]::User)"
         echo -e "${GREEN}Please restart your terminal or run 'refreshenv' for changes to take effect.${NC}"
     fi
