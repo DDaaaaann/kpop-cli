@@ -72,7 +72,8 @@ rm "/tmp/$TARBALL"
 if [[ "$OS" == "windows" ]]; then
     if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
         echo -e "${YELLOW}⚡ Adding $INSTALL_DIR to your PATH...${NC}"
-        powershell.exe -Command "[System.Environment]::SetEnvironmentVariable('Path', \$env:Path + ';$INSTALL_DIR', [System.EnvironmentVariableTarget]::User)"
+        WINDOWS_PATH=$(echo "$INSTALL_DIR" | sed 's/\//\\/g')
+        powershell.exe -Command "[System.Environment]::SetEnvironmentVariable('Path', \$env:Path + ';$WINDOWS_PATH', [System.EnvironmentVariableTarget]::User)"
         echo -e "${GREEN}Please restart your terminal or run 'refreshenv' for changes to take effect.${NC}"
     fi
 else
