@@ -26,7 +26,7 @@ if [[ "$OS" == "mingw"* || "$OS" == "cygwin" || "$OS" == "msys" ]]; then
     OS="windows"
     EXT=".exe"
     TARBALL="${BIN_NAME}_${OS}_${ARCH}.zip"
-    INSTALL_DIR=$(powershell.exe -Command "echo /$env:USERPROFILE/.kpop/bin" | tr -d '\r')
+    INSTALL_DIR=$(powershell.exe -Command "echo \$env:USERPROFILE/.kpop/bin" | tr -d '\r')
 else
     EXT=""
     TARBALL="${BIN_NAME}_${OS}_${ARCH}.tar.gz"
